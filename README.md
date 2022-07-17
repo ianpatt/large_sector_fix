@@ -8,3 +8,7 @@ this plugin is useful if you have installed Skyrim on a drive that does not use 
 ## Installation
 
 Copy to Data/SKSE/Plugins/. Create these folders if they don't exist. Currently there is no log file or feedback; it either works or it doesn't.
+
+## Requirements
+
+[Visual Studio 2022 x64 Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe)
