@@ -23,6 +23,27 @@ struct Patch
 	u8 patchData;
 };
 
+// SE/1.5.x signature
+// tested matching all released versions before 1.6
+
+const u8 kSESignature[] =
+{
+	0x41, 0xBA, 0x03, 0x00, 0x00, 0x00,		// 00	mov     r10d, 3
+	0xB8, 0x00, 0x00, 0x00, 0x68,			// 06	mov     eax, FILE_FLAG_SEQUENTIAL_SCAN or FILE_FLAG_NO_BUFFERING or FILE_FLAG_OVERLAPPED
+											//		patch offset 0x0A from 0x68 -> 0x48
+	0x48, 0xC7, 0x44, 0x24, 0x30,
+		0x00, 0x00, 0x00, 0x00,				// 0B	mov[rsp + 58h + hTemplateFile], 0; hTemplateFile
+	0x45, 0x85, 0xF6,						// 14	test    r14d, r14d
+};
+
+const Patch kSEPatch =
+{
+	kSESignature,
+	sizeof(kSESignature),
+
+	0x0A, 0x48
+};
+
 // AE/1.6.x signature
 // tested matching all currently released versions of 1.6 (317-353)
 
@@ -107,7 +128,9 @@ bool disableUncachedFileAccess()
 
 	u8 * textBase = exeBase + section->VirtualAddress;
 
-	tryApplyPatch(textBase, textLen, &kAEPatch);
+	bool patched = tryApplyPatch(textBase, textLen, &kAEPatch);
+	if(!patched)
+		tryApplyPatch(textBase, textLen, &kSEPatch);
 
 	return result;
 }
@@ -131,6 +154,17 @@ extern "C" {
 };
 
 extern "C" {
+	__declspec(dllexport) bool SKSEPlugin_Query(const SKSEInterface * skse, PluginInfo * info)
+	{
+		info->infoVersion = PluginInfo::kInfoVersion;
+		info->name = "large sector fix patch";
+		info->version = 1;
+
+		// runtime-only. signature patch.
+
+		return skse->isEditor == false;
+	}
+
 	__declspec(dllexport) bool SKSEPlugin_Load(const SKSEInterface * skse)
 	{
 		disableUncachedFileAccess();
