@@ -4,6 +4,7 @@
 
 # build output
 x64
+dist
 
 # non-git files
 PluginAPI.h

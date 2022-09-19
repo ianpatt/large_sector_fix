@@ -146,7 +146,8 @@ extern "C" {
 		"ianpatt",
 		"ianpatt+largesector@gmail.com",
 
-		SKSEPluginVersionData::kVersionIndependent_Signatures,	// signature scanning
+		SKSEPluginVersionData::kVersionIndependentEx_NoStructUse,	// does not rely on either version's structure layout
+		SKSEPluginVersionData::kVersionIndependent_Signatures,		// signature scanning
 		{ 0 },
 
 		0,
